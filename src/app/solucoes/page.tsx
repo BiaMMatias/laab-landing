@@ -196,7 +196,7 @@ export default function Page() {
 
                   {/* VÍDEO WEBAPP */}
                   <ResponsiveVideo
-                    src="/Educ.AI.mp4"
+                    src="https://youtu.be/ZzTN81tyglo"
                     title="Demonstração do WebApp LAAB"
                     muted
                     className="mx-auto max-w-[680px]" // limite de tamanho
@@ -244,7 +244,7 @@ export default function Page() {
 
                   {/* VÍDEO PLANILHA */}
                   <ResponsiveVideo
-                    src="/gestao-vendas.mp4"
+                    src="https://youtu.be/mNvU7pSWSZM"
                     title="Demonstração da Planilha Inteligente LAAB"
                     poster="/videos/poster-planilha.jpg"
                     muted
