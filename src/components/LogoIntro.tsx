@@ -1,16 +1,24 @@
 "use client";
-import { motion, useReducedMotion } from "framer-motion";
+import {
+  motion,
+  useReducedMotion,
+  type TargetAndTransition,
+} from "framer-motion";
 
 export default function LogoIntro() {
   const prefers = useReducedMotion();
 
   // flutuação sutil
-  const float = prefers
+  const float: TargetAndTransition = prefers
     ? {}
     : {
         y: [0, -6, 0, 6, 0],
         rotate: [0, -0.6, 0, 0.6, 0],
-        transition: { duration: 10, repeat: Infinity, ease: "easeInOut" },
+        transition: {
+          duration: 10,
+          repeat: Infinity,
+          ease: [0.42, 0, 0.58, 1], // cubic-bezier equivalente ao easeInOut
+        },
       };
 
   return (
@@ -30,19 +38,18 @@ export default function LogoIntro() {
       <motion.div
         initial={{ opacity: 0, x: "-55vw", rotate: -360, scale: 0.95 }}
         animate={{ opacity: 1, x: 0, rotate: 0, scale: 1 }}
-        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}  
-        // transition={{ type: "spring", stiffness: 120, damping: 14 }}
+        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
         className="relative rounded-full border border-white/20 bg-white/90 p-3 shadow-[0_10px_28px_rgba(0,0,0,.35)] mx-auto"
         style={{ backdropFilter: "blur(6px)" }}
       >
-        {/* 👉 É AQUI que entra o motion.img que você me mostrou */}
+        {/* 👉 motion.img com flutuação contínua */}
         <motion.img
-          src="/laab-logo.png" // coloque o arquivo do logo em public/laab-logo.png
+          src="/laab-logo.png"
           alt="LAAB Tech"
           width={512}
           height={512}
           className="w-full h-auto rounded-full block"
-          animate={float} // flutuação contínua
+          animate={float}
         />
         <span className="pointer-events-none absolute inset-0 rounded-full ring-2 ring-pink-500/70" />
       </motion.div>
