@@ -11,7 +11,7 @@ type ResponsiveVideoProps = {
   autoplay?: boolean;
   loop?: boolean;
   muted?: boolean;
-  className?: string; // novo
+  className?: string;
 };
 
 function isIframeSrc(url: string): boolean {
@@ -23,7 +23,6 @@ function isIframeSrc(url: string): boolean {
     (u.includes("drive.google.com") && u.includes("/preview"))
   );
 }
-
 function toYouTubeEmbed(url: string): string {
   try {
     const u = new URL(url);
@@ -48,13 +47,11 @@ function ResponsiveVideo({
   className = "",
 }: ResponsiveVideoProps) {
   const iframe = isIframeSrc(src);
-
   if (iframe) {
     const embed =
       src.includes("youtube.com") || src.includes("youtu.be")
         ? toYouTubeEmbed(src)
         : src;
-
     return (
       <div
         className={`mt-5 w-full rounded-xl overflow-hidden border border-white/10 bg-black/30 ${className}`}
@@ -72,7 +69,6 @@ function ResponsiveVideo({
       </div>
     );
   }
-
   return (
     <div
       className={`mt-5 w-full rounded-xl overflow-hidden border border-white/10 bg-black/30 ${className}`}
@@ -96,6 +92,226 @@ function ResponsiveVideo({
     </div>
   );
 }
+
+/* ==================== PRICING ==================== */
+type Plano = {
+  nome: string;
+  precoPix: number; // base PIX/transferência
+  destaque?: boolean;
+  itens: string[];
+  ctaLabel: string;
+  ctaHref: string;
+};
+
+const FEE = 0.0499; // 4,99% Mercado Pago
+const brl = (n: number) =>
+  n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const comTaxa = (valor: number) => Math.round(valor * (1 + FEE) * 100) / 100;
+
+/* ---------- NOVOS VALORES ---------- */
+const PLANOS_WEBAPP: Plano[] = [
+  {
+    nome: "Essencial (MVP)",
+    precoPix: 697,
+    itens: [
+      "Até 4 telas essenciais",
+      "Login básico",
+      "Integração Drive/Sheets",
+      "Tema LAAB (padrão)",
+      "Entrega estimada: 1–2 semanas",
+    ],
+    ctaLabel: "Solicitar proposta",
+    ctaHref: "/contato",
+  },
+  {
+    nome: "Profissional",
+    precoPix: 1097,
+    destaque: true,
+    itens: [
+      "8–10 telas + fluxos",
+      "Perfis de acesso",
+      "Dashboards e relatórios",
+      "Integrações (Gmail/Calendar/API)",
+      "Suporte de implantação (30 dias)",
+    ],
+    ctaLabel: "Conversar no WhatsApp",
+    ctaHref: "https://wa.me/5511995363889",
+  },
+  {
+    nome: "Avançado",
+    precoPix: 1497,
+    itens: [
+      "Telas ilimitadas (dentro do escopo)",
+      "Autenticação avançada",
+      "Rotinas/automação (Apps Script)",
+      "Customizações profundas",
+      "Treinamento do time",
+    ],
+    ctaLabel: "Agendar reunião",
+    ctaHref: "/contato",
+  },
+];
+
+const PLANOS_PLANILHA: Plano[] = [
+  {
+    nome: "Starter",
+    precoPix: 297,
+    itens: [
+      "1 processo automatizado",
+      "Dashboard essencial",
+      "Integração básica (Forms/Drive)",
+      "Entrega: 3–5 dias úteis",
+    ],
+    ctaLabel: "Quero essa",
+    ctaHref: "/contato",
+  },
+  {
+    nome: "Pro",
+    precoPix: 697,
+    destaque: true,
+    itens: [
+      "Até 3 processos automatizados",
+      "Dashboard completo + relatórios",
+      "Apps Script sob medida",
+      "Suporte de implantação (15 dias)",
+    ],
+    ctaLabel: "Falar com especialista",
+    ctaHref: "https://wa.me/5511995363889",
+  },
+  {
+    nome: "Plus",
+    precoPix: 997,
+    itens: [
+      "Até 5 processos automatizados",
+      "KPIs avançados + PDF/Excel",
+      "Gatilhos e rotinas (email/eventos)",
+      "Treinamento e handoff",
+    ],
+    ctaLabel: "Quero orçamento",
+    ctaHref: "/contato",
+  },
+];
+
+function PricingCards({ planos }: { planos: Plano[] }) {
+  return (
+    <div className="grid md:grid-cols-3 gap-6">
+      {planos.map((p) => {
+        const precoCartao = comTaxa(p.precoPix);
+        return (
+          <div
+            key={p.nome}
+            className={`rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur
+              ${
+                p.destaque
+                  ? "shadow-[0_12px_36px_rgba(230,62,136,.45)] ring-1 ring-pink-400/40"
+                  : "shadow-[0_8px_24px_rgba(230,62,136,.35)]"
+              }`}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-semibold">{p.nome}</h3>
+              {p.destaque && (
+                <span className="text-xs px-2 py-1 rounded-full bg-pink-500/20 border border-pink-400/30 text-pink-200">
+                  Mais popular
+                </span>
+              )}
+            </div>
+
+            <div className="mt-4 space-y-2">
+              <div>
+                <div className="text-sm text-white/70">PIX / transferência</div>
+                <div className="text-2xl font-bold">{brl(p.precoPix)}</div>
+              </div>
+              <div className="pt-2 border-t border-white/10">
+                <div className="text-sm text-white/70">
+                  Cartão (c/ taxa 4,99%)
+                </div>
+                <div className="text-xl font-semibold">{brl(precoCartao)}</div>
+              </div>
+            </div>
+
+            <ul className="mt-5 space-y-2 text-white/85 text-sm">
+              {p.itens.map((i, idx) => (
+                <li key={idx} className="flex gap-2">
+                  <span>•</span>
+                  <span>{i}</span>
+                </li>
+              ))}
+            </ul>
+
+            <a
+              href={p.ctaHref}
+              className="mt-6 inline-flex w-full items-center justify-center rounded-xl px-4 py-2.5 font-semibold text-white
+                        transition shadow-[0_8px_24px_rgba(230,62,136,.35)] hover:opacity-95 active:opacity-90"
+              style={{ background: "var(--rosa-laab)" }}
+            >
+              {p.ctaLabel}
+            </a>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function PricingSection() {
+  const [produto, setProduto] = useState<"webapp" | "planilha">("webapp");
+  return (
+    <section className="mt-16">
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <h2 className="text-3xl md:text-4xl font-bold">
+            Nossos <span className="text-pink-400">planos & valores</span>
+          </h2>
+          <div className="inline-flex rounded-xl border border-white/10 p-1 bg-white/5">
+            <button
+              onClick={() => setProduto("webapp")}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition
+                ${
+                  produto === "webapp"
+                    ? "bg-pink-500/20 text-pink-200 border border-pink-400/30"
+                    : "text-white/80 hover:bg-white/5"
+                }`}
+            >
+              WebApp
+            </button>
+            <button
+              onClick={() => setProduto("planilha")}
+              className={`ml-1 px-3 py-1.5 rounded-lg text-sm font-medium transition
+                ${
+                  produto === "planilha"
+                    ? "bg-pink-500/20 text-pink-200 border border-pink-400/30"
+                    : "text-white/80 hover:bg-white/5"
+                }`}
+            >
+              Planilha
+            </button>
+          </div>
+        </div>
+
+        <p className="mt-3 text-white/75">
+          Valores à vista (PIX/transferência) e no cartão (com{" "}
+          <strong>4,99%</strong> de taxa do Mercado Pago). Precisa de algo fora
+          do escopo? Falamos por proposta.
+        </p>
+
+        <div className="mt-8">
+          {produto === "webapp" ? (
+            <PricingCards planos={PLANOS_WEBAPP} />
+          ) : (
+            <PricingCards planos={PLANOS_PLANILHA} />
+          )}
+        </div>
+
+        <p className="mt-6 text-xs text-white/60">
+          * Os preços exibidos são sugestões e podem variar conforme o escopo. A
+          taxa de 4,99% é aplicada apenas em pagamentos com cartão via Mercado
+          Pago.
+        </p>
+      </div>
+    </section>
+  );
+}
+/* ==================== /PRICING ==================== */
 
 export default function Page() {
   const [ativo, setAtivo] = useState<Escolha>(null);
@@ -126,7 +342,6 @@ export default function Page() {
             type="button"
             onClick={() => abrir("webapp")}
             onMouseEnter={() => setAtivo("webapp")}
-            onMouseLeave={() => setAtivo((a) => (a === "webapp" ? a : a))}
             className="text-left rounded-2xl border border-white/10 bg-white/5 p-6 transition
                        shadow-[0_8px_24px_rgba(230,62,136,.35)]
                        hover:translate-y-[-2px] hover:shadow-[0_12px_28px_rgba(230,62,136,.45)]
@@ -145,7 +360,6 @@ export default function Page() {
             type="button"
             onClick={() => abrir("planilha")}
             onMouseEnter={() => setAtivo("planilha")}
-            onMouseLeave={() => setAtivo((a) => (a === "planilha" ? a : a))}
             className="text-left rounded-2xl border border-white/10 bg-white/5 p-6 transition
                        shadow-[0_8px_24px_rgba(230,62,136,.35)]
                        hover:translate-y-[-2px] hover:shadow-[0_12px_28px_rgba(230,62,136,.45)]
@@ -180,9 +394,9 @@ export default function Page() {
                     <span className="text-pink-400">WebApp + Mobile?</span>
                   </h4>
                   <p className="text-white/80 mb-4">
-                    Ideal para quem precisa de uma solução robusta, multiusuário
-                    e com navegação por telas. Cresce junto com o negócio e
-                    permite integrações (Drive, Gmail, Calendar, APIs externas).
+                    Ideal para uma solução robusta, multiusuário e com navegação
+                    por telas. Cresce junto com o negócio e integra Drive,
+                    Gmail, Calendar e APIs externas.
                   </p>
                   <ul className="grid md:grid-cols-2 gap-2 text-white/85">
                     <li>✅ Login por usuário e perfis de acesso</li>
@@ -191,15 +405,14 @@ export default function Page() {
                       ✅ Fluxos complexos (cadastros, agendas, documentos)
                     </li>
                     <li>✅ Escalável para novas funcionalidades</li>
-                    <li>✅ Com app mobile, para uso pelo celular</li>
+                    <li>✅ App mobile para uso no celular</li>
                   </ul>
 
-                  {/* VÍDEO WEBAPP */}
                   <ResponsiveVideo
                     src="https://youtu.be/ZzTN81tyglo"
                     title="Demonstração do WebApp LAAB"
                     muted
-                    className="mx-auto max-w-[680px]" // limite de tamanho
+                    className="mx-auto max-w-[680px]"
                   />
 
                   <div className="mt-6">
@@ -233,7 +446,7 @@ export default function Page() {
                   <p className="text-white/80 mb-4">
                     Perfeita para começar rápido, com custo baixo e sem
                     hospedagem. Automatizações em Apps Script e dashboards
-                    prontos para decisão.
+                    prontos.
                   </p>
                   <ul className="grid md:grid-cols-2 gap-2 text-white/85">
                     <li>✅ Implantação rápida e curva de uso mínima</li>
@@ -242,13 +455,12 @@ export default function Page() {
                     <li>✅ Seus dados na sua conta Google (sem servidor)</li>
                   </ul>
 
-                  {/* VÍDEO PLANILHA */}
                   <ResponsiveVideo
                     src="https://youtu.be/mNvU7pSWSZM"
                     title="Demonstração da Planilha Inteligente LAAB"
                     poster="/videos/poster-planilha.jpg"
                     muted
-                    className="mx-auto max-w-[680px]" // limite de tamanho
+                    className="mx-auto max-w-[680px]"
                   />
 
                   <div className="mt-6">
@@ -265,13 +477,13 @@ export default function Page() {
               </motion.div>
             )}
           </AnimatePresence>
+
           {/* ---------- NOSSAS PLATAFORMAS ---------- */}
           <section className="mt-14">
             <h1 className="text-3xl md:text-6xl font-bold text-center md:text-left mb-6">
               Nossas <span className="text-pink-400">plataformas</span>
             </h1>
-            
-            {/** Se preferir, ajuste os links (href) para rotas reais, ex: /plataforma/educ-ai */}
+
             <div className="grid md:grid-cols-2 gap-8">
               {/* EDUC.AI */}
               <div className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-[0_8px_24px_rgba(230,62,136,.35)] backdrop-blur">
@@ -279,7 +491,8 @@ export default function Page() {
                   <span className="text-2xl">📚</span>
                   <div>
                     <h3 className="text-xl font-semibold">
-                      <span className="text-pink-400">Educ</span>.AI — Plataforma Educacional
+                      <span className="text-pink-400">Educ</span>.AI —
+                      Plataforma Educacional
                     </h3>
                     <p className="text-white/80">
                       Cursos, cadastros, trilhas, fóruns e repositório —
@@ -306,12 +519,6 @@ export default function Page() {
                   >
                     Falar sobre o Educ.AI
                   </a>
-                  {/* <a
-                    href="/plataforma/educ-ai"
-                    className="underline underline-offset-4 text-white/80 hover:text-white"
-                  >
-                    Ver detalhes
-                  </a> */}
                 </div>
               </div>
 
@@ -320,16 +527,18 @@ export default function Page() {
                 <div className="flex items-start gap-3 mb-3">
                   <span className="text-2xl">🩺</span>
                   <div>
-                    <h3 className="text-xl font-semibold"><span className="text-pink-400">Cuid</span>.AI — Saúde</h3>
+                    <h3 className="text-xl font-semibold">
+                      <span className="text-pink-400">Cuid</span>.AI — Saúde
+                    </h3>
                     <p className="text-white/80">
                       Prontuário + agenda + evolução. Ideal para clínicas e
-                      profissionais (psicologia, nutrição, terapia ocupacional etc.).
+                      profissionais (psicologia, nutrição, etc.).
                     </p>
                   </div>
                 </div>
                 <ul className="mt-3 grid grid-cols-1 gap-1 text-white/85 text-sm">
                   <li>• Perfis diferentes de acesso</li>
-                  <li>• Chat de conversa com IA para dúvidas pacientes ou profissionais</li>
+                  <li>• Chat com IA para dúvidas</li>
                   <li>• Fichas, evoluções e anexos</li>
                   <li>• Agenda com lembretes</li>
                   <li>• Relatórios e histórico</li>
@@ -343,12 +552,6 @@ export default function Page() {
                   >
                     Falar sobre o Cuid.AI
                   </a>
-                  {/* <a
-                    href="/plataforma/cuid-ai"
-                    className="underline underline-offset-4 text-white/80 hover:text-white"
-                  >
-                    Ver detalhes
-                  </a> */}
                 </div>
               </div>
 
@@ -358,7 +561,8 @@ export default function Page() {
                   <span className="text-2xl">💼</span>
                   <div>
                     <h3 className="text-xl font-semibold">
-                      <span className="text-pink-400">Vend</span>.AI — Gestão de Vendas & Estoque
+                      <span className="text-pink-400">Vend</span>.AI — Gestão de
+                      Vendas & Estoque
                     </h3>
                     <p className="text-white/80">
                       Controle de pedidos, clientes, estoque e indicadores —
@@ -368,7 +572,7 @@ export default function Page() {
                 </div>
                 <ul className="mt-3 grid grid-cols-1 gap-1 text-white/85 text-sm">
                   <li>• Cadastro de produtos e entradas/saídas</li>
-                  <li>• Registro de vendas com automatização em estoque</li>
+                  <li>• Registro de vendas com automatização no estoque</li>
                   <li>• Controle de estoque</li>
                   <li>• Dashboard de vendas e metas</li>
                   <li>• Livro Caixa</li>
@@ -383,12 +587,6 @@ export default function Page() {
                   >
                     Falar sobre o Vend.AI
                   </a>
-                  {/* <a
-                    href="/plataforma/vend-ai"
-                    className="underline underline-offset-4 text-white/80 hover:text-white"
-                  >
-                    Ver detalhes
-                  </a> */}
                 </div>
               </div>
 
@@ -398,11 +596,12 @@ export default function Page() {
                   <span className="text-2xl">📅</span>
                   <div>
                     <h3 className="text-xl font-semibold">
-                      <span className="text-pink-400">Agend</span>.AI — Agendamentos
+                      <span className="text-pink-400">Agend</span>.AI —
+                      Agendamentos
                     </h3>
                     <p className="text-white/80">
-                      Agendamento fácil com lembretes, confirmação e histórico —
-                      tudo no seu Google.
+                      Agendamento com lembretes, confirmação e histórico — tudo
+                      no seu Google.
                     </p>
                   </div>
                 </div>
@@ -420,16 +619,13 @@ export default function Page() {
                   >
                     Falar sobre o Agend.AI
                   </a>
-                  {/* <a
-                    href="/plataforma/agend-ai"
-                    className="underline underline-offset-4 text-white/80 hover:text-white"
-                  >
-                    Ver detalhes
-                  </a> */}
                 </div>
               </div>
             </div>
           </section>
+
+          {/* ====== PRICING (novo) ====== */}
+          <PricingSection />
         </div>
       </section>
     </main>
